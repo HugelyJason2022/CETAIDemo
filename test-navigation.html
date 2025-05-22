@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导航测试页面</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/ai-assistant.css">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-container {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #f5f7fa;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #409EFF;
+        }
+        .test-description {
+            margin-bottom: 15px;
+            color: #606266;
+        }
+        .test-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f0f9eb;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #409EFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #66b1ff;
+        }
+        .test-log {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI助手导航功能测试</h1>
+    
+    <div class="test-container">
+        <div class="test-title">测试1：直接链接导航测试</div>
+        <div class="test-description">测试直接点击链接跳转到抄表计费页面</div>
+        <a href="chaobiaojifei.html">直接链接到抄表计费</a>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试2：JavaScript导航测试</div>
+        <div class="test-description">使用JavaScript window.location.href测试导航</div>
+        <button onclick="window.location.href='chaobiaojifei.html'">JS导航到抄表计费</button>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试3：带参数导航测试</div>
+        <div class="test-description">测试带参数跳转到抄表计费页面</div>
+        <button onclick="window.location.href='chaobiaojifei.html?tenant=恒和园&meterType=day&date=2023-05-01&aiopen=true'">带参数导航到抄表计费</button>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试4：模拟AI助手导航</div>
+        <div class="test-description">模拟AI助手的导航处理函数</div>
+        <button onclick="simulateAINavigation()">模拟AI助手导航</button>
+        <div id="simulationResult" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试5：相对路径vs绝对路径</div>
+        <div class="test-description">测试不同路径格式</div>
+        <button onclick="testRelativePath()">相对路径</button>
+        <button onclick="testAbsolutePath()">绝对路径</button>
+        <div id="pathTestResult" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试日志</div>
+        <div class="test-log" id="testLog"></div>
+    </div>
+    
+    <script>
+        // 添加日志函数
+        function log(message) {
+            const logElem = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElem.innerHTML += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        // 初始化日志
+        log('测试页面已加载');
+        log('当前URL: ' + window.location.href);
+        
+        // 测试函数4：模拟AI助手导航
+        function simulateAINavigation() {
+            log('模拟AI助手导航开始');
+            
+            const targetPage = 'chaobiaojifei.html';
+            const queryParams = {
+                tenant: '恒和园',
+                meterType: 'day',
+                date: '2023-05-01'
+            };
+            
+            try {
+                // 构建URL
+                let finalUrl = targetPage;
+                
+                // 添加参数
+                if (Object.keys(queryParams).length > 0) {
+                    const urlObj = new URL(finalUrl, window.location.origin);
+                    for (const [key, value] of Object.entries(queryParams)) {
+                        if (value !== undefined && value !== null && value !== '') {
+                            urlObj.searchParams.append(key, value);
+                        }
+                    }
+                    finalUrl = urlObj.pathname + urlObj.search;
+                }
+                
+                // 将目标页面信息添加到URL中，确保AI助手在新页面自动打开
+                finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'aiopen=true';
+                
+                log('生成的导航URL: ' + finalUrl);
+                
+                // 显示结果但不执行跳转
+                const resultElem = document.getElementById('simulationResult');
+                resultElem.style.display = 'block';
+                resultElem.innerHTML = `
+                    <p><strong>导航URL:</strong> ${finalUrl}</p>
+                    <p><strong>完整URL:</strong> ${new URL(finalUrl, window.location.origin).href}</p>
+                    <button onclick="window.location.href='${finalUrl}'">执行导航</button>
+                `;
+            } catch (error) {
+                log('模拟导航出错: ' + error.message);
+            }
+        }
+        
+        // 测试函数5：相对路径vs绝对路径
+        function testRelativePath() {
+            const relativePath = 'chaobiaojifei.html?test=relative';
+            log('测试相对路径: ' + relativePath);
+            
+            const resultElem = document.getElementById('pathTestResult');
+            resultElem.style.display = 'block';
+            resultElem.innerHTML = `
+                <p><strong>相对路径:</strong> ${relativePath}</p>
+                <p><strong>解析后的URL:</strong> ${new URL(relativePath, window.location.origin).href}</p>
+                <button onclick="window.location.href='${relativePath}'">执行导航</button>
+            `;
+        }
+        
+        function testAbsolutePath() {
+            const absolutePath = '/chaobiaojifei.html?test=absolute';
+            log('测试绝对路径: ' + absolutePath);
+            
+            const resultElem = document.getElementById('pathTestResult');
+            resultElem.style.display = 'block';
+            resultElem.innerHTML = `
+                <p><strong>绝对路径:</strong> ${absolutePath}</p>
+                <p><strong>解析后的URL:</strong> ${new URL(absolutePath, window.location.origin).href}</p>
+                <button onclick="window.location.href='${absolutePath}'">执行导航</button>
+            `;
+        }
+    </script>
+    
+    <!-- 加载AI助手模拟脚本 -->
+    <script src="js/debug-assistant.js"></script>
+</body>
+</html> 

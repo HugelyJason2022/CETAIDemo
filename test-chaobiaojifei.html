@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试抄表计费功能</title>
+    <link href="https://cdn.jsdelivr.net/npm/element-plus@2.3.1/dist/index.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-container {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #409EFF;
+        }
+        .test-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f5f7fa;
+            border-radius: 4px;
+            color: #606266;
+        }
+        .test-button {
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            background-color: #409EFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background-color: #66b1ff;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-left: 3px solid #67C23A;
+            background-color: #f0f9eb;
+            color: #606266;
+            min-height: 40px;
+        }
+        .log-container {
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #f8f8f8;
+        }
+        .log-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .log-item {
+            margin-bottom: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: #333;
+        }
+        .log-item-debug {
+            color: #67C23A;
+        }
+        .log-item-error {
+            color: #F56C6C;
+        }
+    </style>
+</head>
+<body>
+    <h1>测试抄表计费功能</h1>
+    
+    <div class="test-container">
+        <div class="test-title">测试用例1: 基本抄表计费指令</div>
+        <div class="test-input">查询抄表计费</div>
+        <button class="test-button" onclick="testCommand('查询抄表计费')">测试</button>
+        <div class="test-result" id="result1"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试用例2: 带租户的抄表计费指令</div>
+        <div class="test-input">查询恒和园的抄表计费</div>
+        <button class="test-button" onclick="testCommand('查询恒和园的抄表计费')">测试</button>
+        <div class="test-result" id="result2"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试用例3: 带日期的抄表计费指令</div>
+        <div class="test-input">查询2023-05-10的抄表计费</div>
+        <button class="test-button" onclick="testCommand('查询2023-05-10的抄表计费')">测试</button>
+        <div class="test-result" id="result3"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试用例4: 带租户和日期的抄表计费指令</div>
+        <div class="test-input">查询恒和园一层2023年05月的抄表计费</div>
+        <button class="test-button" onclick="testCommand('查询恒和园一层2023年05月的抄表计费')">测试</button>
+        <div class="test-result" id="result4"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试用例5: 带搜索关键词的抄表计费指令</div>
+        <div class="test-input">查询关键词中电252的抄表计费</div>
+        <button class="test-button" onclick="testCommand('查询关键词中电252的抄表计费')">测试</button>
+        <div class="test-result" id="result5"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">测试用例6: 复杂抄表计费指令</div>
+        <div class="test-input">查询知春园南区2023年05月的日表，搜索中电252</div>
+        <button class="test-button" onclick="testCommand('查询知春园南区2023年05月的日表，搜索中电252')">测试</button>
+        <div class="test-result" id="result6"></div>
+    </div>
+    
+    <div class="log-container">
+        <div class="log-title">控制台日志</div>
+        <div id="log-content"></div>
+    </div>
+    
+    <script src="js/ai-assistant.js"></script>
+    <script>
+        // 覆盖console.log以便显示在页面上
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        console.log = function() {
+            // 调用原始的console.log
+            originalConsoleLog.apply(console, arguments);
+            
+            // 将日志添加到页面
+            const logContainer = document.getElementById('log-content');
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item log-item-debug';
+            logItem.textContent = Array.from(arguments).join(' ');
+            logContainer.appendChild(logItem);
+            
+            // 滚动到底部
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+        
+        console.error = function() {
+            // 调用原始的console.error
+            originalConsoleError.apply(console, arguments);
+            
+            // 将错误日志添加到页面
+            const logContainer = document.getElementById('log-content');
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item log-item-error';
+            logItem.textContent = Array.from(arguments).join(' ');
+            logContainer.appendChild(logItem);
+            
+            // 滚动到底部
+            logContainer.scrollTop = logContainer.scrollHeight;
+        };
+        
+        // 模拟AI助手
+        class MockAIAssistant extends AIAssistant {
+            constructor() {
+                super();
+                
+                // 覆盖handleLocalResponse方法，不实际跳转，而是显示结果
+                this.handleLocalResponse = function(response, shouldNavigate, targetPage, queryParams = {}) {
+                    console.log('模拟处理本地响应:');
+                    console.log('- 响应消息:', response);
+                    console.log('- 是否导航:', shouldNavigate);
+                    console.log('- 目标页面:', targetPage);
+                    console.log('- 查询参数:', JSON.stringify(queryParams, null, 2));
+                    
+                    // 返回处理结果
+                    return {
+                        response,
+                        shouldNavigate,
+                        targetPage,
+                        queryParams
+                    };
+                };
+            }
+        }
+        
+        // 创建模拟AI助手实例
+        const mockAssistant = new MockAIAssistant();
+        
+        // 测试命令
+        function testCommand(command) {
+            console.log('========= 测试命令: ' + command + ' =========');
+            
+            // 清理console
+            document.getElementById('log-content').innerHTML = '';
+            
+            // 获取测试用例编号
+            const caseNumber = parseInt(event.target.parentElement.querySelector('.test-title').textContent.match(/\d+/)[0]);
+            const resultElement = document.getElementById('result' + caseNumber);
+            
+            try {
+                // 处理命令
+                mockAssistant.processUserInput(command);
+                
+                // 构建结果HTML
+                const resultHTML = `
+                    <div>命令处理成功!</div>
+                    <div>请查看控制台日志了解详细处理过程</div>
+                `;
+                
+                resultElement.innerHTML = resultHTML;
+            } catch (error) {
+                console.error('测试出错:', error);
+                resultElement.innerHTML = `<div style="color: #F56C6C;">测试失败: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html> 
